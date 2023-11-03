@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  password   String
+  role       UserRole @default(customer)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isVerified Boolean  @default(false)
+  reviews    Review[]
+  profile    Profile?
+
+  @@map("users")
+}
+
+model TokenWhiteList {
+  id             String   @id @default(uuid())
+  userId         String
+  accessToken    String?
+  refreshToken   String?
+  refreshTokenId String?
+  expiredAt      DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("tokens")
+}
+
+enum UserRole {
+  admin
+  customer
+}
+
+model Profile {
+  id         String   @id @default(uuid()) // Unique profile ID
+  username   String   @unique
+  // Add other user profile fields (e.g., address, phone number, etc.)
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @unique // relation scalar field (used in the `@relation` attribute above)
+  bio        String?
+  profileImg String?
+  phoneNo    String?
+  address    String?
+  gender     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+// Define the Menu model
+model Menu {
+  id           String           @id @default(uuid()) // Unique Menu ID
+  name         String // Menu name
+  description  String? // Menu description
+  price        Float // Menu price
+  category     Category         @relation(fields: [categoryId], references: [id]) // Menu category
+  availability MenuAvailability
+  image        String
+  categoryId   String
+  location     String?
+  reviews      Review[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@map("menus")
+}
+
+enum MenuAvailability {
+  Available
+  Upcoming
+}
+
+// Define the Category model
+model Category {
+  id        String   @id @default(uuid()) // Unique category ID
+  name      String // Category name
+  // Add other category-related fields if needed
+  menus     Menu[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}
+
+// Define the Review model
+model Review {
+  id        String   @id @default(uuid()) // Unique review ID
+  userId    String // Foreign key to User
+  menuId    String // Foreign key to Menu
+  rating    Float // Rating given by the user
+  comment   String? // User's review comment
+  user      User     @relation(fields: [userId], references: [id])
+  menus     Menu     @relation(fields: [menuId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
+}
