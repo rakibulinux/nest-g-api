@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '@modules/user/user.repository';
 import { Prisma, User } from '@prisma/client';
-import { PaginatorTypes } from '@nodeteam/nestjs-prisma-pagination';
+import { PaginatorTypes } from 'index';
 
 @Injectable()
 export class UserService {
@@ -19,6 +19,9 @@ export class UserService {
   findOne(id: string): Promise<User> {
     return this.userRepository.findOne({
       where: { id },
+      include: {
+        profile: true,
+      },
     });
   }
 

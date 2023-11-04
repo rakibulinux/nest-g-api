@@ -14,7 +14,7 @@ import { PRISMA_SERVICE_OPTIONS } from './prisma.constants';
 export class PrismaService
   extends PrismaClient<
     Prisma.PrismaClientOptions,
-    'query' | 'info' | 'warn' | 'error'
+    'query' | 'info' | 'warn' | 'error' | 'beforeExit'
   >
   implements OnModuleInit
 {

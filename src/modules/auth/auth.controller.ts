@@ -28,7 +28,7 @@ export class AuthController {
   @Serialize(UserBaseEntity)
   @SkipAuth()
   @Post('sign-up')
-  create(@Body() signUpDto: SignUpDto): Promise<User> {
+  create(@Body() signUpDto: SignUpDto): Promise<Partial<User>> {
     return this.authService.singUp(signUpDto);
   }
 

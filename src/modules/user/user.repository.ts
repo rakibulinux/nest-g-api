@@ -1,8 +1,8 @@
 import { PrismaService } from '@providers/prisma';
 import { Injectable } from '@nestjs/common';
-import { paginator } from '@nodeteam/nestjs-prisma-pagination';
-import { PaginatorTypes } from '@nodeteam/nestjs-prisma-pagination';
 import { Prisma, User } from '@prisma/client';
+import { PaginatorTypes } from 'index';
+import { paginator } from 'src/nodeteam';
 
 @Injectable()
 export class UserRepository {
@@ -24,6 +24,9 @@ export class UserRepository {
   findById(id: string): Promise<User> {
     return this.prisma.user.findUnique({
       where: { id },
+      include: {
+        profile: true,
+      },
     });
   }
 
@@ -42,10 +45,42 @@ export class UserRepository {
    * @param data Prisma.UserCreateInput
    * @returns Promise<User>
    */
-  async create(data: Prisma.UserCreateInput): Promise<User> {
-    return this.prisma.user.create({
-      data,
+  async create(data: Prisma.UserCreateInput): Promise<Partial<User>> {
+    const email = data.email;
+    const atIndex = email.indexOf('@'); // Find the position of the '@' symbol
+    const username = email.slice(0, atIndex); // Extract the username
+    // Create a Prisma transaction
+    const result = await this.prisma.$transaction(async (transaction) => {
+      // Create a User and associate it with the Profile
+      const user = await transaction.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          role: data.role,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isEmailVerified: true,
+          password: false,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+      // Create a Profile
+      await transaction.profile.create({
+        data: {
+          username: username,
+          userId: user.id,
+        },
+      });
+
+      return user;
     });
+    return result;
   }
 
   /**
@@ -61,6 +96,9 @@ export class UserRepository {
     return this.paginate(this.prisma.user, {
       where,
       orderBy,
+      include: {
+        profile: true,
+      },
     });
   }
 }

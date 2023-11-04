@@ -15,5 +15,5 @@ export default class UserEntity implements User {
 
   readonly updatedAt!: Date;
 
-  readonly isVerified!: boolean;
+  readonly isEmailVerified!: boolean;
 }

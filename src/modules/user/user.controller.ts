@@ -19,12 +19,11 @@ import {
 } from '@modules/casl';
 import UserEntity from '@modules/user/entities/user.entity';
 import Serialize from '@decorators/serialize.decorator';
-import { OrderByPipe, WherePipe } from '@nodeteam/nestjs-pipes';
 import { Prisma, User } from '@prisma/client';
-import { PaginatorTypes } from '@nodeteam/nestjs-prisma-pagination';
 import UserBaseEntity from '@modules/user/entities/user-base.entity';
 import { UserHook } from '@modules/user/user.hook';
 import ApiOkBaseResponse from '@decorators/api-ok-base-response.decorator';
+import { OrderByPipe, PaginatorTypes, WherePipe } from 'src/nodeteam';
 
 @ApiTags('Users')
 @ApiBearerAuth()

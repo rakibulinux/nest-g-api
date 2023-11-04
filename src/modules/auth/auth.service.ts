@@ -28,7 +28,7 @@ export class AuthService {
    * @returns Promise<User> - Created user
    * @throws ConflictException - User with this email or phone already exists
    */
-  async singUp(signUpDto: SignUpDto): Promise<User> {
+  async singUp(signUpDto: SignUpDto): Promise<Partial<User>> {
     const testUser: User = await this.userRepository.findOne({
       where: { email: signUpDto.email },
     });
@@ -79,7 +79,7 @@ export class AuthService {
     return this.tokenService.sign({
       id: testUser.id,
       email: testUser.email,
-      roles: testUser.role,
+      role: testUser.role,
     });
   }
 

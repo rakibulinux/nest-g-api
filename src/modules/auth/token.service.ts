@@ -5,6 +5,12 @@ import * as bcrypt from 'bcrypt';
 import { TokenRepository } from '@modules/auth/token.repository';
 import { TokenWhiteList } from '@prisma/client';
 
+interface IPayload {
+  id: string;
+  email: string;
+  role: string;
+}
+
 @Injectable()
 export class TokenService {
   constructor(
@@ -13,7 +19,8 @@ export class TokenService {
     private readonly tokenRepository: TokenRepository,
   ) {}
 
-  async sign(payload): Promise<Auth.AccessRefreshTokens> {
+  async sign(payload: IPayload): Promise<Auth.AccessRefreshTokens> {
+    console.log(payload);
     const userId = payload.id;
     const _accessToken = this.createJwtAccessToken(payload);
     const _refreshToken = this.createJwtRefreshToken(payload);
@@ -39,9 +46,8 @@ export class TokenService {
   async getAccessTokenFromWhitelist(
     accessToken: string,
   ): Promise<TokenWhiteList | void> {
-    const token = await this.tokenRepository.getAccessTokenFromWhitelist(
-      accessToken,
-    );
+    const token =
+      await this.tokenRepository.getAccessTokenFromWhitelist(accessToken);
 
     if (!token) {
       // check if token is in the whitelist
@@ -52,9 +58,8 @@ export class TokenService {
   async refreshTokens(
     refreshToken: string,
   ): Promise<Auth.AccessRefreshTokens | void> {
-    const token = await this.tokenRepository.getRefreshTokenFromWhitelist(
-      refreshToken,
-    );
+    const token =
+      await this.tokenRepository.getRefreshTokenFromWhitelist(refreshToken);
 
     if (!token) {
       // check if token is in the whitelist
@@ -68,7 +73,7 @@ export class TokenService {
     const _payload = {
       id: payload.id,
       email: payload.email,
-      roles: payload.roles,
+      role: payload.role,
     };
 
     const _accessToken = this.createJwtAccessToken(_payload);
