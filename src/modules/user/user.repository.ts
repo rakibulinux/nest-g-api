@@ -47,6 +47,7 @@ export class UserRepository {
    */
   async create(data: Prisma.UserCreateInput): Promise<Partial<User>> {
     const email = data.email;
+    console.log(data);
     const atIndex = email.indexOf('@'); // Find the position of the '@' symbol
     const username = email.slice(0, atIndex); // Extract the username
     // Create a Prisma transaction

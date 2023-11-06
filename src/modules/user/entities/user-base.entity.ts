@@ -18,7 +18,7 @@ export default class UserBaseEntity extends PartialType(UserEntity) {
   @Expose()
   declare readonly email: string | null;
 
-  @ApiProperty({ type: String })
+  @ApiProperty({ type: String, default: 'customer' })
   @Expose()
   declare readonly role: UserRole;
 
@@ -30,7 +30,7 @@ export default class UserBaseEntity extends PartialType(UserEntity) {
   @Expose()
   declare readonly profileImg: string | null;
 
-  @ApiProperty({ type: Boolean })
+  @ApiProperty({ type: Boolean, default: false })
   @Expose()
   declare readonly isEmailVerified: boolean;
 }

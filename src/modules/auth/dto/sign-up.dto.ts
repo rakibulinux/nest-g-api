@@ -6,7 +6,6 @@ import {
   Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '@prisma/client';
 
 export class SignUpDto {
   @ApiProperty({ type: String })
@@ -18,9 +17,7 @@ export class SignUpDto {
   @IsString()
   @IsNotEmpty()
   readonly name!: string;
-  @ApiProperty({ type: String, default: 'customer' })
-  @IsString()
-  readonly role?: UserRole;
+
   @ApiProperty({ type: String })
   @IsString()
   @Length(6, 20)

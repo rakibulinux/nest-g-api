@@ -9,7 +9,7 @@ export default class UserEntity implements User {
 
   readonly password!: string | null;
 
-  readonly role!: UserRole;
+  readonly role: UserRole;
 
   readonly createdAt!: Date;
 

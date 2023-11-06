@@ -4,9 +4,11 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { TokenRepository } from '@modules/auth/token.repository';
 import { TokenWhiteList } from '@prisma/client';
-
+const EXPIRE_TIME = 1000 * 60 * 5;
 interface IPayload {
   id: string;
+  name: string;
+  isEmailVerified: boolean;
   email: string;
   role: string;
 }
@@ -20,7 +22,6 @@ export class TokenService {
   ) {}
 
   async sign(payload: IPayload): Promise<Auth.AccessRefreshTokens> {
-    console.log(payload);
     const userId = payload.id;
     const _accessToken = this.createJwtAccessToken(payload);
     const _refreshToken = this.createJwtRefreshToken(payload);
@@ -38,8 +39,12 @@ export class TokenService {
     );
 
     return {
-      accessToken: _accessToken,
-      refreshToken: _refreshToken,
+      user: payload,
+      backendTokens: {
+        accessToken: _accessToken,
+        refreshToken: _refreshToken,
+        expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+      },
     };
   }
 
@@ -55,12 +60,11 @@ export class TokenService {
     }
   }
 
-  async refreshTokens(
-    refreshToken: string,
+  async refreshToken(
+    refreshToken: any,
   ): Promise<Auth.AccessRefreshTokens | void> {
     const token =
       await this.tokenRepository.getRefreshTokenFromWhitelist(refreshToken);
-
     if (!token) {
       // check if token is in the whitelist
       throw new UnauthorizedException();
@@ -69,11 +73,12 @@ export class TokenService {
     const payload = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.get<string>('jwt.refreshToken'),
     });
-
     const _payload = {
       id: payload.id,
+      name: payload.name,
       email: payload.email,
       role: payload.role,
+      isEmailVerified: payload.isEmailVerified,
     };
 
     const _accessToken = this.createJwtAccessToken(_payload);
@@ -92,8 +97,11 @@ export class TokenService {
     );
 
     return {
-      accessToken: _accessToken,
-      refreshToken: _refreshToken,
+      backendTokens: {
+        accessToken: _accessToken,
+        refreshToken: _refreshToken,
+        expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+      },
     };
   }
 

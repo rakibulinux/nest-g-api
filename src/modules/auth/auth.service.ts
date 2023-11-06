@@ -14,12 +14,17 @@ import {
 import { User } from '@prisma/client';
 import { SignInDto } from '@modules/auth/dto/sign-in.dto';
 import { TokenService } from '@modules/auth/token.service';
+import { AuthMessages, AuthViews } from './auth.constants';
+import { GenerateAndSendUrlArgs } from './auth.typings';
+import { EmailService } from 'src/email';
+import { joinToUrl } from '@helpers/url';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly tokenService: TokenService,
+    private readonly email: EmailService,
   ) {}
 
   /**
@@ -55,9 +60,12 @@ export class AuthService {
       },
       select: {
         id: true,
+        name: true,
         email: true,
         password: true,
         role: true,
+        isEmailVerified: true,
+        profile: true,
       },
     });
 
@@ -78,18 +86,43 @@ export class AuthService {
 
     return this.tokenService.sign({
       id: testUser.id,
+      name: testUser.name,
       email: testUser.email,
       role: testUser.role,
+      isEmailVerified: testUser.isEmailVerified,
     });
   }
 
-  refreshTokens(
-    refreshToken: string,
-  ): Promise<Auth.AccessRefreshTokens | void> {
-    return this.tokenService.refreshTokens(refreshToken);
+  // Refresh Token
+  refreshToken(refreshToken: string): Promise<Auth.AccessRefreshTokens | void> {
+    return this.tokenService.refreshToken(refreshToken);
   }
 
   logout(userId: string, accessToken: string): Promise<void> {
     return this.tokenService.logout(userId, accessToken);
+  }
+
+  async generateAndSendUrl({
+    host,
+    user,
+    action,
+    template,
+    callbackUrl,
+  }: GenerateAndSendUrlArgs) {
+    const url = callbackUrl
+      ? `${joinToUrl(callbackUrl, user.id)}`
+      : `${host}/auth/${AuthViews.resetPassword}/${user.id}`;
+    console.log(host, user, action, template, callbackUrl);
+    await this.email.sendEmail({
+      subject: AuthMessages[action],
+      to: user.email,
+      template,
+      data: {
+        username: user.email.split('@')[0],
+        url,
+      },
+    });
+
+    return { credentials: { ...user, password: undefined }, url };
   }
 }

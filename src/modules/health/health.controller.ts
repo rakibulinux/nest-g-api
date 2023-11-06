@@ -7,6 +7,7 @@ import {
   HealthCheckResult,
 } from '@nestjs/terminus';
 import { SkipAuth } from '@modules/auth/skip-auth.guard';
+import { EmailService } from 'src/email';
 
 @Controller('health')
 export default class HealthController {
@@ -14,6 +15,7 @@ export default class HealthController {
     private health: HealthCheckService,
     private memory: MemoryHealthIndicator,
     private readonly disk: DiskHealthIndicator,
+    private readonly emailService: EmailService,
   ) {}
 
   @Get()
@@ -25,6 +27,16 @@ export default class HealthController {
     ]);
   }
 
+  @SkipAuth()
+  @Get('test-email')
+  async testEmail() {
+    return await this.emailService.sendEmail({
+      to: 'rakibulinux@gmail.com',
+      subject: 'Reset Your Password',
+      template: 'reset-your-password',
+      data: { name: 'MD RAKIBUL ISLAM RAKIB' },
+    });
+  }
   @Get('memory')
   @SkipAuth()
   @HealthCheck()

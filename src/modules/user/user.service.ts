@@ -26,6 +26,20 @@ export class UserService {
   }
 
   /**
+   * @desc Find a user by id
+   * @param id
+   * @returns Promise<User>
+   */
+  findByEmail(email: string): Promise<User> {
+    return this.userRepository.findOne({
+      where: { email },
+      include: {
+        profile: true,
+      },
+    });
+  }
+
+  /**
    * @desc Find all users with pagination
    * @param where
    * @param orderBy

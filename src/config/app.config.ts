@@ -20,6 +20,13 @@ export default registerAs('app', () => ({
     process.env.APP_LOGGER_LEVEL || 'log,error,warn,debug,verbose',
   ),
   env: process.env.NODE_ENV || 'dev',
-  // eslint-disable-next-line global-require,@typescript-eslint/no-var-requires
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   version: require(path.join(process.cwd(), 'package.json')).version,
+  email: {
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 }));
