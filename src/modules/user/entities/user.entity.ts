@@ -8,6 +8,8 @@ export default class UserEntity implements User {
   readonly name!: string | null;
 
   readonly password!: string | null;
+  readonly fileId!: string | null;
+  readonly hash!: string | null;
 
   readonly role: UserRole;
 

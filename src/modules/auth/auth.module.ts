@@ -6,8 +6,9 @@ import { TokenService } from '@modules/auth/token.service';
 import { TokenRepository } from '@modules/auth/token.repository';
 import { CaslModule } from '@modules/casl';
 import { permissions } from '@modules/auth/auth.permissions';
-import { EmailService } from 'src/email';
-import { UserService } from '@modules/user/user.service';
+import { MailService } from '@modules/mail/mail.service';
+import { MailerService } from '@modules/mailer/mailer.service';
+import { ForgotService } from '@modules/forgot/forgot.service';
 
 @Module({
   imports: [CaslModule.forFeature({ permissions })],
@@ -17,8 +18,9 @@ import { UserService } from '@modules/user/user.service';
     TokenService,
     UserRepository,
     TokenRepository,
-    EmailService,
-    UserService,
+    MailService,
+    MailerService,
+    ForgotService,
   ],
 })
 export class AuthModule {}

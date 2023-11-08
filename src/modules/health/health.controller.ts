@@ -7,7 +7,7 @@ import {
   HealthCheckResult,
 } from '@nestjs/terminus';
 import { SkipAuth } from '@modules/auth/skip-auth.guard';
-import { EmailService } from 'src/email';
+import { EmailService } from '@modules/email';
 
 @Controller('health')
 export default class HealthController {

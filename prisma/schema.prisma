@@ -7,6 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Forgot {
+  id        String    @id @default(uuid()) @map("PK_087959f5bb89da4ce3d763eab75")
+  hash      String    @map("forgot_hash") @db.VarChar
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt DateTime? @db.Timestamp(6)
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_31f3c80de0525250f31e23a9b83")
+
+  @@index([hash], map: "IDX_df507d27b0fb20cd5f7bef9b9a")
+  @@map("forgot")
+}
+
+model File {
+  id    String @id @default(uuid()) @map("PK_36b46d232307066b3a2c9ea3a1d") @db.Uuid
+  path  String @map("file_path") @db.VarChar
+  users User[]
+
+  @@map("file")
+}
+
 model User {
   id              String         @id @default(uuid())
   email           String         @unique
@@ -20,6 +40,10 @@ model User {
   profile         Profile?
   notifications   Notification[]
   orders          Order[]
+  forgot          Forgot[]
+  file            File?          @relation(fields: [fileId], references: [id])
+  fileId          String?        @db.Uuid
+  hash            String?        @map("user_hash") @db.VarChar
 
   @@map("users")
 }

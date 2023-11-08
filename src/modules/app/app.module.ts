@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
 import appConfig from '@config/app.config';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import swaggerConfig from '@config/swagger.config';
 import HealthModule from '@modules/health/health.module';
 import { PrismaModule } from '@providers/prisma/prisma.module';
 import { UserModule } from '@modules/user/user.module';
-import { loggingMiddleware, createUserMiddleware } from '@providers/prisma';
+import {
+  loggingMiddleware,
+  createUserMiddleware,
+  PrismaService,
+} from '@providers/prisma';
 import { AuthModule } from '@modules/auth/auth.module';
 import jwtConfig from '@config/jwt.config';
 import { CaslModule } from '@modules/casl';
@@ -17,19 +21,58 @@ import sqsConfig from '@config/sqs.config';
 import { TokenService } from '@modules/auth/token.service';
 import { TokenRepository } from '@modules/auth/token.repository';
 import { UserRole } from '@prisma/client';
+import mailConfig from '@config/mail.config';
+import fileConfig from '@config/file.config';
+import { HeaderResolver, I18nModule } from 'nestjs-i18n';
+import { AllConfigType } from '@config/config.type';
+import path from 'path';
+import { ForgotModule } from '@modules/forgot/forgot.module';
+import { FilesModule } from '@modules/files/files.module';
+import { MailModule } from '@modules/mail/mail.module';
+import { MailerModule } from '@modules/mailer/mailer.module';
 
 @Module({
-  controllers: [],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, swaggerConfig, jwtConfig, s3Config, sqsConfig],
+      load: [
+        appConfig,
+        swaggerConfig,
+        jwtConfig,
+        mailConfig,
+        fileConfig,
+        s3Config,
+        sqsConfig,
+      ],
     }),
     PrismaModule.forRoot({
       isGlobal: true,
       prismaServiceOptions: {
         middlewares: [loggingMiddleware(), createUserMiddleware()],
       },
+    }),
+    I18nModule.forRootAsync({
+      useFactory: (configService: ConfigService<AllConfigType>) => ({
+        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
+          infer: true,
+        }),
+        loaderOptions: { path: path.join('src/i18n/'), watch: true },
+      }),
+      resolvers: [
+        {
+          use: HeaderResolver,
+          useFactory: (configService: ConfigService<AllConfigType>) => {
+            return [
+              configService.get('app.headerLanguage', {
+                infer: true,
+              }),
+            ];
+          },
+          inject: [ConfigService],
+        },
+      ],
+      imports: [ConfigModule],
+      inject: [ConfigService],
     }),
     JwtModule.register({
       global: true,
@@ -41,11 +84,17 @@ import { UserRole } from '@prisma/client';
     HealthModule,
     UserModule,
     AuthModule,
+    ForgotModule,
+    FilesModule,
+    MailModule,
+    MailerModule,
   ],
+  controllers: [],
   providers: [
     TokenService,
     JwtService,
     TokenRepository,
+    PrismaService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

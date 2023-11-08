@@ -1,7 +1,8 @@
-import { Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiExtraModels,
   ApiQuery,
   ApiTags,
@@ -24,6 +25,7 @@ import UserBaseEntity from '@modules/user/entities/user-base.entity';
 import { UserHook } from '@modules/user/user.hook';
 import ApiOkBaseResponse from '@decorators/api-ok-base-response.decorator';
 import { OrderByPipe, PaginatorTypes, WherePipe } from 'src/nodeteam';
+import { UserRepository } from './user.repository';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -31,7 +33,10 @@ import { OrderByPipe, PaginatorTypes, WherePipe } from 'src/nodeteam';
 @ApiBaseResponses()
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   @Get()
   @ApiQuery({ name: 'where', required: false, type: 'string' })
@@ -62,21 +67,19 @@ export class UserController {
     return this.userService.findOne(tokenUser.id);
   }
 
+  @ApiBody({ type: UserBaseEntity })
   @Patch('me')
   @UseGuards(AccessGuard)
   @Serialize(UserBaseEntity)
   @UseAbility(Actions.update, UserEntity, UserHook)
   async updateUser(
-    @CaslUser() userProxy?: UserProxy<User>,
-    // @CaslConditions() conditions?: ConditionsProxy,
+    @Body() body,
+    @CaslUser()
+    userProxy?: UserProxy<User>,
     @CaslSubject() subjectProxy?: SubjectProxy<User>,
   ): Promise<User> {
     const tokenUser = await userProxy.get();
-    const subject = await subjectProxy.get();
-
-    console.log(tokenUser);
-    console.log(subject);
-
-    return subject;
+    await subjectProxy.get();
+    return this.userRepository.updateProfile(body, tokenUser);
   }
 }

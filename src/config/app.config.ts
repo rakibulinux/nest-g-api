@@ -29,4 +29,10 @@ export default registerAs('app', () => ({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  workingDirectory: process.env.PWD || process.cwd(),
+  frontendDomain: process.env.FRONTEND_DOMAIN,
+  backendDomain: process.env.BACKEND_DOMAIN ?? 'http://localhost',
+  apiPrefix: process.env.API_PREFIX || 'api',
+  fallbackLanguage: process.env.APP_FALLBACK_LANGUAGE || 'en',
+  headerLanguage: process.env.APP_HEADER_LANGUAGE || 'x-custom-lang',
 }));

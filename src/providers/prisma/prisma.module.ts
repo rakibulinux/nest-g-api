@@ -6,8 +6,9 @@ import {
 } from './interfaces';
 import { PRISMA_SERVICE_OPTIONS } from './prisma.constants';
 import { PrismaService } from './prisma.service';
-
+import { PrismaClient } from '@prisma/client';
 @Module({
+  imports: [PrismaModule, PrismaClient],
   providers: [PrismaService],
   exports: [PrismaService],
 })

@@ -8,7 +8,6 @@ export class UserHook implements UserBeforeFilterHook<User> {
   constructor(readonly userService: UserService) {}
 
   async run(request) {
-    console.log(request);
     return this.userService.findById(request.user.id);
   }
 }

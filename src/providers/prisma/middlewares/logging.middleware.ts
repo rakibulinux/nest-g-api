@@ -33,11 +33,15 @@ export interface QueryInfo {
    */
   executionTime: number;
 }
-
+// loggingMiddleware({
+//   logger: new Logger('PrismaMiddleware'),
+//   logLevel: 'log',
+// }),
 export function loggingMiddleware(
   { logger, logMessage, logLevel }: LoggingMiddlewareOptions = {
-    logger: console,
-    logLevel: 'debug',
+    // logger: console,
+    logger: new Logger('PrismaMiddleware'),
+    logLevel: 'log',
   },
 ): Prisma.Middleware {
   return async (params, next) => {

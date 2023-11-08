@@ -21,7 +21,7 @@ export class PrismaService
   constructor(
     @Optional()
     @Inject(PRISMA_SERVICE_OPTIONS)
-    private readonly prismaServiceOptions: PrismaServiceOptions = {},
+    private prismaServiceOptions: PrismaServiceOptions = {},
   ) {
     super(prismaServiceOptions.prismaOptions);
 
@@ -42,5 +42,8 @@ export class PrismaService
     this.$on('beforeExit', async () => {
       await app.close();
     });
+  }
+  async findUnique(entityName: string, where: any) {
+    return this.prismaServiceOptions[entityName].findUnique({ where });
   }
 }
