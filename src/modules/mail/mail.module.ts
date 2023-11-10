@@ -8,7 +8,6 @@ import { AuthModule } from '@modules/auth/auth.module';
 import { AuthService } from '@modules/auth/auth.service';
 import { UserRepository } from '@modules/user/user.repository';
 import { TokenService } from '@modules/auth/token.service';
-import { EmailService } from '@modules/email';
 import { ForgotService } from '@modules/forgot/forgot.service';
 import { TokenRepository } from '@modules/auth/token.repository';
 
@@ -21,7 +20,6 @@ import { TokenRepository } from '@modules/auth/token.repository';
     AuthService,
     UserRepository,
     TokenService,
-    EmailService,
     ForgotService,
     TokenRepository,
   ],

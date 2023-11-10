@@ -16,7 +16,7 @@ export class UserService {
    * @param id
    * @returns Promise<User>
    */
-  findOne(id: string): Promise<User> {
+  async findOne(id: string): Promise<User> {
     return this.userRepository.findOne({
       where: { id },
       include: {
@@ -30,7 +30,7 @@ export class UserService {
    * @param id
    * @returns Promise<User>
    */
-  findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User> {
     return this.userRepository.findOne({
       where: { email },
       include: {
@@ -44,7 +44,7 @@ export class UserService {
    * @param where
    * @param orderBy
    */
-  findAll(
+  async findAll(
     where: Prisma.UserWhereInput,
     orderBy: Prisma.UserOrderByWithRelationInput,
   ): Promise<PaginatorTypes.PaginatedResult<User>> {

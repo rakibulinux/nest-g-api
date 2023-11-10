@@ -31,7 +31,7 @@ export class UserRepository {
     });
   }
 
-  findById(id: string): Promise<User> {
+  async findById(id: string): Promise<User> {
     return this.prisma.user.findUnique({
       where: { id },
       include: {

@@ -15,7 +15,7 @@ function parseLogLevel(level: string | undefined): string[] {
 
 export default registerAs('app', () => ({
   port: process.env.APP_PORT || 5000,
-  baseUrl: process.env.BASE_URL || 'http://localhost:5000',
+  baseUrl: process.env.BACKEND_DOMAIN || 'http://localhost:5000',
   loggerLevel: parseLogLevel(
     process.env.APP_LOGGER_LEVEL || 'log,error,warn,debug,verbose',
   ),
@@ -31,7 +31,7 @@ export default registerAs('app', () => ({
   },
   workingDirectory: process.env.PWD || process.cwd(),
   frontendDomain: process.env.FRONTEND_DOMAIN,
-  backendDomain: process.env.BACKEND_DOMAIN ?? 'http://localhost',
+  backendDomain: process.env.BACKEND_DOMAIN ?? 'http://localhost:5000',
   apiPrefix: process.env.API_PREFIX || 'api',
   fallbackLanguage: process.env.APP_FALLBACK_LANGUAGE || 'en',
   headerLanguage: process.env.APP_HEADER_LANGUAGE || 'x-custom-lang',

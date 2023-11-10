@@ -4,6 +4,28 @@ CREATE TYPE "UserRole" AS ENUM ('admin', 'customer');
 -- CreateEnum
 CREATE TYPE "ProductAvailability" AS ENUM ('available', 'upcoming');
 
+-- CreateEnum
+CREATE TYPE "OrderStatus" AS ENUM ('pending', 'delivered');
+
+-- CreateTable
+CREATE TABLE "forgot" (
+    "PK_087959f5bb89da4ce3d763eab75" TEXT NOT NULL,
+    "forgot_hash" VARCHAR NOT NULL,
+    "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deletedAt" TIMESTAMP(6),
+    "userId" TEXT,
+
+    CONSTRAINT "forgot_pkey" PRIMARY KEY ("PK_087959f5bb89da4ce3d763eab75")
+);
+
+-- CreateTable
+CREATE TABLE "file" (
+    "PK_36b46d232307066b3a2c9ea3a1d" UUID NOT NULL,
+    "file_path" VARCHAR NOT NULL,
+
+    CONSTRAINT "file_pkey" PRIMARY KEY ("PK_36b46d232307066b3a2c9ea3a1d")
+);
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -14,6 +36,8 @@ CREATE TABLE "users" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isEmailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "fileId" UUID,
+    "user_hash" VARCHAR,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -79,7 +103,7 @@ CREATE TABLE "orders" (
     "id" TEXT NOT NULL,
     "price" DECIMAL(65,30) NOT NULL,
     "Products" JSONB[],
-    "status" TEXT NOT NULL,
+    "status" "OrderStatus" NOT NULL DEFAULT 'pending',
     "intent_id" TEXT,
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -114,6 +138,9 @@ CREATE TABLE "notifications" (
 );
 
 -- CreateIndex
+CREATE INDEX "IDX_df507d27b0fb20cd5f7bef9b9a" ON "forgot"("forgot_hash");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
@@ -124,6 +151,12 @@ CREATE UNIQUE INDEX "profiles_userId_key" ON "profiles"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "orders_intent_id_key" ON "orders"("intent_id");
+
+-- AddForeignKey
+ALTER TABLE "forgot" ADD CONSTRAINT "FK_31f3c80de0525250f31e23a9b83" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_fileId_fkey" FOREIGN KEY ("fileId") REFERENCES "file"("PK_36b46d232307066b3a2c9ea3a1d") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

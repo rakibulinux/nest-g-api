@@ -13,7 +13,6 @@ import {
   Actions,
   CaslSubject,
   CaslUser,
-  // ConditionsProxy,
   SubjectProxy,
   UseAbility,
   UserProxy,

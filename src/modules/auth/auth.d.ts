@@ -8,7 +8,7 @@ interface IUser {
 
 interface BackendTokens {
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
   expiresIn: number;
 }
 

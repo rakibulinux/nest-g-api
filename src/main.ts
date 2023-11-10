@@ -20,7 +20,6 @@ import { ThrottlerExceptionsFilter } from '@filters/throttler-exception.filter';
 import { TransformInterceptor } from '@interceptors/transform.interceptor';
 import { AccessExceptionFilter } from '@filters/access-exception.filter';
 import { NotFoundExceptionFilter } from '@filters/not-found-exception.filter';
-import { join } from 'path';
 
 async function bootstrap(): Promise<{ port: number }> {
   /**
@@ -139,7 +138,6 @@ async function bootstrap(): Promise<{ port: number }> {
       new ThrottlerExceptionsFilter(),
     );
   }
-  app.setBaseViewsDir(join(__dirname, '..', 'dist/templates/views'));
   await app.listen(appConfig.port);
 
   return appConfig;
