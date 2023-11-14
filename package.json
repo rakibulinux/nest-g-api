@@ -70,7 +70,8 @@
     "reflect-metadata": "0.1.13",
     "rxjs": "7.8.1",
     "sqs-consumer": "7.4.0",
-    "sqs-producer": "3.4.0"
+    "sqs-producer": "3.4.0",
+    "stripe": "^14.4.0"
   },
   "devDependencies": {
     "@commitlint/cli": "18.2.0",

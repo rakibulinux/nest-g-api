@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { TokenRepository } from '@modules/auth/token.repository';
 import { TokenWhiteList } from '@prisma/client';
+import { PrismaService } from '@providers/prisma';
 const EXPIRE_TIME = 1000 * 60 * 5;
 interface IPayload {
   id: string;
@@ -19,6 +20,7 @@ export class TokenService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly tokenRepository: TokenRepository,
+    private readonly prisma: PrismaService,
   ) {}
 
   async sign(payload: IPayload): Promise<Auth.AccessRefreshTokens> {
@@ -111,13 +113,18 @@ export class TokenService {
         userId,
         accessToken,
       );
-
-    await Promise.all([
-      this.tokenRepository.deleteAccessTokenFromWhitelist(_accessToken.id),
-      this.tokenRepository.deleteRefreshTokenFromWhitelist(
-        _accessToken.refreshTokenId,
-      ),
-    ]);
+    console.log(_accessToken);
+    await this.prisma.tokenWhiteList.deleteMany({
+      where: {
+        userId,
+      },
+    });
+    // await Promise.all([
+    //   this.tokenRepository.deleteAccessTokenFromWhitelist(_accessToken.id),
+    //   this.tokenRepository.deleteRefreshTokenFromWhitelist(
+    //     _accessToken.refreshTokenId,
+    //   ),
+    // ]);
 
     return;
   }

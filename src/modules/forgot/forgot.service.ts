@@ -25,9 +25,8 @@ export class ForgotService {
   }
 
   async softDelete(id: string): Promise<void> {
-    await this.prisma.forgot.update({
+    await this.prisma.forgot.delete({
       where: { id },
-      data: { deletedAt: new Date() },
     });
   }
 }

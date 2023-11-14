@@ -20,9 +20,13 @@ model Forgot {
 }
 
 model File {
-  id    String @id @default(uuid()) @map("PK_36b46d232307066b3a2c9ea3a1d") @db.Uuid
-  path  String @map("file_path") @db.VarChar
-  users User[]
+  id         String    @id @default(uuid()) @map("PK_36b46d232307066b3a2c9ea3a1d") @db.Uuid
+  path       String    @map("file_path") @db.VarChar
+  users      User[]
+  product    Product?  @relation(fields: [productId], references: [id])
+  productId  String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
 
   @@map("file")
 }
@@ -83,53 +87,59 @@ model Profile {
   @@map("profiles")
 }
 
+// Define the Category model
+model Category {
+  id        String    @id @default(uuid()) // Unique category ID
+  name      String // Category name
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  img       File[]
+
+  @@unique([id, slug])
+  @@map("categories")
+}
+
 // Define the Product model
 model Product {
   id           String              @id @default(uuid()) // Unique Product ID
   name         String // Product name
   description  String? // Product description
-  price        Float // Product price
-  category     Category            @relation(fields: [categoryId], references: [id]) // Product category
-  availability ProductAvailability @default(available)
-  isFeatured   Boolean             @default(false)
-  image        String
+  price        Decimal // Product price
+  category     Category            @relation(fields: [categoryId, catSlug], references: [id, slug]) // Product category
   categoryId   String
+  catSlug      String
+  availability ProductAvailability @default(Available)
+  isFeatured   Boolean             @default(false)
+  options      Json[]
+  slug         String              @unique
   reviews      Review[]
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
+  images       File[]
 
   @@map("products")
 }
 
-enum ProductAvailability {
-  available
-  upcoming
-}
-
-// Define the Category model
-model Category {
-  id        String    @id @default(uuid()) // Unique category ID
-  name      String // Category name
-  // Add other category-related fields if needed
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@map("categories")
-}
-
 model Order {
-  id        String      @id @default(uuid())
-  price     Decimal
-  Products  Json[]
-  status    OrderStatus @default(pending)
-  intent_id String?     @unique
-  user      User        @relation(fields: [userId], references: [id])
-  userId    String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id            String      @id @default(uuid())
+  price         Decimal
+  products      Json[]
+  status        OrderStatus @default(pending)
+  intent_id     String?     @unique
+  paymentStatus Boolean     @default(false)
+  user          User        @relation(fields: [userId], references: [id])
+  userId        String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   @@map("orders")
+}
+
+enum ProductAvailability {
+  Available
+  Upcoming
 }
 
 enum OrderStatus {

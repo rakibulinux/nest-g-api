@@ -67,6 +67,7 @@ export class AuthController {
   async refreshToken(@Request() req): Promise<Auth.AccessRefreshTokens | void> {
     return this.authService.refreshToken(req.headers.authorization);
   }
+
   @Post('logout')
   @ApiBearerAuth()
   @UseGuards(AccessGuard)

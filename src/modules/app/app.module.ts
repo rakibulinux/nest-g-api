@@ -30,6 +30,9 @@ import { ForgotModule } from '@modules/forgot/forgot.module';
 import { FilesModule } from '@modules/files/files.module';
 import { MailModule } from '@modules/mail/mail.module';
 import { MailerModule } from '@modules/mailer/mailer.module';
+import { OrderModule } from '@modules/order/order.module';
+import { ProductModule } from '@modules/product/product.module';
+import { CategoryModule } from '@modules/category/category.module';
 
 @Module({
   imports: [
@@ -88,6 +91,9 @@ import { MailerModule } from '@modules/mailer/mailer.module';
     FilesModule,
     MailModule,
     MailerModule,
+    OrderModule,
+    ProductModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [

@@ -8,7 +8,8 @@ import { MailService } from '@modules/mail/mail.service';
 import crypto from 'crypto';
 import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 import { ForgotService } from '@modules/forgot/forgot.service';
-import { hash } from 'bcrypt';
+// import { hash } from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserRepository {
@@ -66,7 +67,7 @@ export class UserRepository {
     // Create a Prisma transaction
     const result = await this.prisma.$transaction(async (transaction) => {
       // Create a User and associate it with the Profile
-      const hashPassword = await hash(data.password, 12);
+      const hashPassword = await bcrypt.hash(data.password, 12);
       const user = await transaction.user.create({
         data: {
           name: data.name,
@@ -170,7 +171,7 @@ export class UserRepository {
         hash,
       },
     });
-
+    console.log(forgot);
     if (!forgot) {
       throw new HttpException(
         {
@@ -182,7 +183,7 @@ export class UserRepository {
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-
+    const hashPassword = await bcrypt.hash(password, 12);
     const user = await this.prisma.user.findUnique({
       where: {
         id: forgot.userId,
@@ -192,7 +193,7 @@ export class UserRepository {
     await this.prisma.user.update({
       where: { id: user.id },
       data: {
-        password,
+        password: hashPassword,
       },
     });
 
